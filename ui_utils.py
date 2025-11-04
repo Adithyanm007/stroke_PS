@@ -1,20 +1,41 @@
 import streamlit as st
 import pandas as pd
 from translations import dropdown_vals
+from user_manager import register_user, authenticate_user
 
 def login_page(t, valid_user, valid_pass):
-    if 'logged_in' not in st.session_state:
-        st.session_state.logged_in = False
-    if not st.session_state.logged_in:
-        st.title(t["login_title"])
-        username = st.text_input(t["username"])
-        password = st.text_input(t["password"], type='password')
-        if st.button(t["login_button"]):
-            if username == valid_user and password == valid_pass:
-                st.session_state.logged_in = True
-                st.success(t["login_success"])
-    else:
-        st.info(f"{t['login_success']} {t['select_language']} to continue.")
+    st.title(t["login_title"])
+    username = st.text_input(t["username"], key="login_user")
+    password = st.text_input(t["password"], type="password", key="login_pass")
+    login_btn = st.button(t["login_button"], key="real_login")
+    login_success = False
+    if login_btn:
+        if authenticate_user(username, password):
+            st.success(t["login_success"])
+            login_success = True
+        else:
+            st.error(t["login_error"])
+    st.write("---")
+    if st.button("Create a new account"):
+        st.session_state.show_registration = True
+    if st.session_state.get("show_registration"):
+        account_creation_page(t)
+    return login_success
+
+def account_creation_page(t):
+    st.header("Create Account")
+    username = st.text_input("New Username", key="reg_username")
+    password = st.text_input("New Password", type="password", key="reg_password")
+    create_btn = st.button("Create Account")
+    if create_btn and username and password:
+        success, message = register_user(username, password)
+        if success:
+            st.success(message)
+            st.session_state.logged_in = True
+            # Rerun mechanism will apply on next app cycle
+        else:
+            st.error(message)
+
 
 def stroke_prediction_app(t, model, lang):
     st.title(t["app_title"])
