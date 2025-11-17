@@ -4,7 +4,7 @@ from translations import dropdown_vals
 from user_manager import register_user, authenticate_user
 
 def login_page(t, valid_user, valid_pass):
-    st.image("logo.png", width=200)
+    st.image("logo.png", width=280)
     st.title(t["login_title"])
     username = st.text_input(t["username"], key="login_user")
     password = st.text_input(t["password"], type="password", key="login_pass")
@@ -78,6 +78,7 @@ def stroke_prediction_app(t, model, lang):
         ])
         pred_prob = model.predict_proba(input_data)[0][1]
         st.success(f"{t['prediction_result']} {pred_prob*100:.2f}%")
+
 
 
 
